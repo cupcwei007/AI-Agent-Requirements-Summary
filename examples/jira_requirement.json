@@ -1,0 +1,15 @@
+{
+  "tenant_id": "demo",
+  "external_id": "PAY-123",
+  "title": "订单部分退款",
+  "text": "用户可以针对一笔订单发起部分退款。\n\n该需求优先级为 P1，目前状态为评审中。",
+  "source_type": "jira",
+  "source_url": "https://jira.example/browse/PAY-123",
+  "allowed_principals": ["user:alice", "group:product"],
+  "metadata": {
+    "priority": "P1",
+    "status": "review",
+    "project": "PAY"
+  },
+  "updated_at": "2026-08-13T00:00:00+00:00"
+}
