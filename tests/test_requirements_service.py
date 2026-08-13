@@ -1,3 +1,8 @@
+import json
+import os
+import subprocess
+import sys
+
 from requirements_agent.models import SourceDocument
 from requirements_agent.service import RequirementsService
 from requirements_agent.store import SQLiteStore
@@ -63,3 +68,22 @@ def test_no_evidence_returns_explicit_refusal_without_citations():
     assert answer.insufficient_evidence is True
     assert answer.citations == ()
     assert "没有找到" in answer.text
+
+
+def test_cli_json_exposes_citations(tmp_path):
+    database = tmp_path / "requirements.db"
+    environment = {**os.environ, "PYTHONPATH": "src"}
+    subprocess.run(
+        [sys.executable, "-m", "requirements_agent.cli", "--database", str(database),
+         "ingest-json", "examples/jira_requirement.json"],
+        check=True, env=environment, capture_output=True, text=True,
+    )
+    result = subprocess.run(
+        [sys.executable, "-m", "requirements_agent.cli", "--database", str(database),
+         "ask", "--tenant", "demo", "--principal", "user:alice", "--json", "部分退款"],
+        check=True, env=environment, capture_output=True, text=True,
+    )
+    payload = json.loads(result.stdout)
+    assert payload["insufficient_evidence"] is False
+    assert payload["citations"][0]["external_id"] == "PAY-123"
+    assert payload["citations"][0]["source_url"].endswith("PAY-123")

@@ -20,6 +20,9 @@ def main() -> None:
     ask.add_argument("question")
     ask.add_argument("--tenant", required=True)
     ask.add_argument("--principal", action="append", required=True)
+    ask.add_argument(
+        "--json", action="store_true", help="output answer and citations as JSON"
+    )
     args = parser.parse_args()
 
     store = SQLiteStore(args.database)
@@ -36,7 +39,28 @@ def main() -> None:
                 principals=args.principal,
                 question=args.question,
             )
-            print(answer.text)
+            if args.json:
+                print(json.dumps(
+                    {
+                        "answer": answer.text,
+                        "insufficient_evidence": answer.insufficient_evidence,
+                        "citations": [
+                            {
+                                "chunk_id": hit.chunk_id,
+                                "external_id": hit.external_id,
+                                "title": hit.title,
+                                "text": hit.text,
+                                "source_url": hit.source_url,
+                                "metadata": hit.metadata,
+                                "score": hit.score,
+                            }
+                            for hit in answer.citations
+                        ],
+                    },
+                    ensure_ascii=False,
+                ))
+            else:
+                print(answer.text)
     finally:
         store.close()
 

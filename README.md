@@ -4,6 +4,12 @@
 
 ## 快速开始
 
+完整的本地命令、预期结果、负向权限测试和当前完成度矩阵见 [`LOCAL_ACCEPTANCE.md`](LOCAL_ACCEPTANCE.md)。最快的验收方式是运行：
+
+```bash
+python scripts/acceptance.py
+```
+
 项目当前仅使用 Python 标准库，测试需要 Python 3.11+ 与 pytest：
 
 ```bash
